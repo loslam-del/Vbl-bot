@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_description">Shows connection status for VBL-BOT. It does not control games or tap screen elements.</string>
+</resources>
