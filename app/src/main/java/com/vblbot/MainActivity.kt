@@ -17,6 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -32,13 +40,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+private val VblNavy = Color(0xFF0B1020)
+private val VblPanel = Color(0xFF171F35)
+private val VblAccent = Color(0xFF8794FF)
+private val VblMint = Color(0xFF50D6B2)
+
 private enum class VblPage { HOME, BALL, TRAINING, STYLES, GUIDE, STATS, SETTINGS }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            MaterialTheme(colorScheme = darkColorScheme(primary = VblAccent, secondary = VblMint, background = VblNavy, surface = VblPanel, surfaceVariant = Color(0xFF26314D))) {
                 VblApp(
                     onOpenAccessibility = { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
                     preferences = getSharedPreferences("vbl_stats", Context.MODE_PRIVATE)
@@ -58,23 +71,20 @@ private fun VblApp(
     var receives by remember { mutableIntStateOf(preferences.getInt("receives", 0)) }
     var sets by remember { mutableIntStateOf(preferences.getInt("sets", 0)) }
     var serves by remember { mutableIntStateOf(preferences.getInt("serves", 0)) }
-    var sessionNotes by remember { mutableStateOf(preferences.getString("notes", "") ?: "") }
 
     fun saveCount(key: String, value: Int) {
         preferences.edit().putInt(key, value).apply()
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()).padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    Surface(modifier = Modifier.fillMaxSize(), color = VblNavy) {
+        Column(modifier = Modifier.fillMaxSize()) {
+          Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
-                    Text("VBL-BOT", style = MaterialTheme.typography.headlineLarge)
-                    Text("Тренировочный центр · BETA")
+                    Text("VBL-BOT", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black)
+                    Text("VOLLEYBALL LEGENDS COACH", color = VblMint, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
-                Text("🏐", style = MaterialTheme.typography.headlineMedium)
+                Text("🏐", style = MaterialTheme.typography.headlineLarge)
             }
             when (page) {
                 VblPage.HOME -> HomeMenu(
@@ -118,10 +128,14 @@ private fun VblApp(
                     onBack = { page = VblPage.HOME }
                 )
             }
-            Text(
-                "VBL-BOT помогает анализировать тренировки. Он не нажимает игровые кнопки и не управляет персонажем.",
-                style = MaterialTheme.typography.bodySmall
-            )
+            Text("ТРЕНИРОВОЧНЫЙ ПОМОЩНИК • Не управляет персонажем и не нажимает игровые кнопки.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+          }
+          NavigationBar(containerColor = VblPanel) {
+            NavigationBarItem(selected = page == VblPage.HOME, onClick = { page = VblPage.HOME }, icon = { Text("⌂") }, label = { Text("Главная") })
+            NavigationBarItem(selected = page == VblPage.TRAINING, onClick = { page = VblPage.TRAINING }, icon = { Text("⚡") }, label = { Text("Тренировка") })
+            NavigationBarItem(selected = page == VblPage.BALL, onClick = { page = VblPage.BALL }, icon = { Text("◎") }, label = { Text("Анализ") })
+            NavigationBarItem(selected = page == VblPage.STATS, onClick = { page = VblPage.STATS }, icon = { Text("▥") }, label = { Text("Статы") })
+          }
         }
     }
 }
@@ -131,18 +145,26 @@ private fun HomeMenu(
     onBall: () -> Unit, onTraining: () -> Unit, onStyles: () -> Unit,
     onGuide: () -> Unit, onStats: () -> Unit, onSettings: () -> Unit
 ) {
-    Text("Главное меню", style = MaterialTheme.typography.titleLarge)
-    MenuCard("🎯  Анализ мяча", "Захват экрана и распознавание мяча — следующий этап разработки.", "Открыть") { onBall() }
-    MenuCard("🏋️  Тренировки", "Счётчик приёмов, передач и подач с сохранением на телефоне.", "Тренироваться") { onTraining() }
-    MenuCard("⚙️  Профили стилей", "Выбери профиль для тестирования прогнозной модели.", "Настроить") { onStyles() }
-    MenuCard("📚  Советы и гайды", "Подсказки по позиционированию, приёму, сетам и тренировкам.", "Читать") { onGuide() }
-    MenuCard("📊  Статистика", "Твои записанные тренировочные действия.", "Открыть") { onStats() }
-    MenuCard("🔧  Настройки", "Разрешения и информация о приложении.", "Открыть") { onSettings() }
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF26345C))) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("ТВОЯ ИГРА. ТВОЙ ПРОГРЕСС.", color = VblMint, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            Text("Стань точнее\nс каждой тренировкой", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text("Записывай действия, отслеживай прогресс и изучай игровые ситуации.")
+            Button(onClick = onTraining, modifier = Modifier.fillMaxWidth()) { Text("Начать тренировку  →") }
+        }
+    }
+    Text("ИНСТРУМЕНТЫ", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+    MenuCard("🎯  Анализ мяча", "Подготовка к распознаванию мяча и разбору траектории.", "Открыть") { onBall() }
+    MenuCard("🏋️  Тренировки", "Счётчики приёмов, передач и подач с сохранением.", "Тренироваться") { onTraining() }
+    MenuCard("🧩  Профили стилей", "Выбери режим для будущей настройки анализа.", "Настроить") { onStyles() }
+    MenuCard("📚  Советы и гайды", "Приём, передачи, подачи и чтение игровых эпизодов.", "Читать") { onGuide() }
+    MenuCard("📊  Статистика", "Все записанные тренировочные действия.", "Открыть") { onStats() }
+    MenuCard("⚙️  Настройки", "Разрешения и информация о приложении.", "Открыть") { onSettings() }
 }
 
 @Composable
 private fun MenuCard(title: String, description: String, action: String, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = VblPanel)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium)
             Text(description, style = MaterialTheme.typography.bodyMedium)
@@ -154,7 +176,7 @@ private fun MenuCard(title: String, description: String, action: String, onClick
 @Composable
 private fun BallScreen(onBack: () -> Unit) {
     Text("Анализ мяча", style = MaterialTheme.typography.titleLarge)
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = VblPanel)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Статус: разработка", style = MaterialTheme.typography.titleMedium)
             Text("Планируемые инструменты: системный захват экрана Android с твоего разрешения, поиск мяча на кадрах, отслеживание движения, линия примерной траектории и отметка предполагаемой точки приземления.")
@@ -242,9 +264,10 @@ private fun GuideScreen(onBack: () -> Unit) {
 @Composable
 private fun StatsScreen(receives: Int, sets: Int, serves: Int, onReset: () -> Unit, onBack: () -> Unit) {
     Text("Статистика", style = MaterialTheme.typography.titleLarge)
-    CounterCard("Записано приёмов", receives, "—") {}
-    CounterCard("Записано передач", sets, "—") {}
-    CounterCard("Записано подач", serves, "—") {}
+    StatLine("Приёмы", receives)
+    StatLine("Передачи", sets)
+    StatLine("Подачи", serves)
+    StatLine("Всего отметок", receives + sets + serves)
     Text("Это ручные тренировочные отметки, не автоматическая статистика Roblox.")
     OutlinedButton(onClick = onReset, modifier = Modifier.fillMaxWidth()) { Text("Сбросить статистику") }
     BackButton(onBack)
@@ -268,4 +291,14 @@ private fun SettingsScreen(selectedProfile: String, onOpenAccessibility: () -> U
 private fun BackButton(onBack: () -> Unit) {
     Spacer(Modifier.height(4.dp))
     OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("← Назад в меню") }
+}
+
+@Composable
+private fun StatLine(label: String, value: Int) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = VblPanel)) {
+        Row(Modifier.fillMaxWidth().padding(18.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(label, fontWeight = FontWeight.SemiBold)
+            Text(value.toString(), color = VblMint, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        }
+    }
 }
