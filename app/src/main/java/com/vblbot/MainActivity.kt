@@ -80,7 +80,7 @@ private fun VblHome(onOpenAccessibility: () -> Unit) {
                         OutlinedTextField(value = xText, onValueChange = { xText = it }, label = { Text("X") }, modifier = Modifier.weight(1f), singleLine = true)
                         OutlinedTextField(value = yText, onValueChange = { yText = it }, label = { Text("Y") }, modifier = Modifier.weight(1f), singleLine = true)
                     }
-                    Text("Профиль удара: \${profile.label}")
+                    Text("Профиль удара: ${profile.label}")
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Button(onClick = { profile = ShotProfile.GENERAL }) { Text("Общий") }
                         Button(onClick = { profile = ShotProfile.FAST }) { Text("Быстрый") }
@@ -100,10 +100,10 @@ private fun VblHome(onOpenAccessibility: () -> Unit) {
                             if (observations.size > 8) observations.removeAt(0)
                             val prediction = TrajectoryPredictor.predict(observations, profile)
                             result = if (prediction == null) {
-                                "Наблюдение добавлено: \${observations.size}. Нужно минимум 3."
+                                "Наблюдение добавлено: ${observations.size}. Нужно минимум 3."
                             } else {
-                                "Прогноз на экране: X=\${prediction.x.toInt()}, Y=\${prediction.y.toInt()}\\n" +
-                                    "Условная уверенность: \${(prediction.confidence * 100).toInt()}%\\n" + prediction.note
+                                "Прогноз на экране: X=${prediction.x.toInt()}, Y=${prediction.y.toInt()}\\n" +
+                                    "Условная уверенность: ${(prediction.confidence * 100).toInt()}%\\n" + prediction.note
                             }
                         }
                     }, modifier = Modifier.fillMaxWidth()) { Text("Добавить координату и пересчитать") }
@@ -111,7 +111,7 @@ private fun VblHome(onOpenAccessibility: () -> Unit) {
                         observations.clear()
                         result = "Наблюдения очищены."
                     }, modifier = Modifier.fillMaxWidth()) { Text("Сбросить наблюдения") }
-                    Text("Точек записано: \${observations.size}")
+                    Text("Точек записано: ${observations.size}")
                     Text(result, style = MaterialTheme.typography.bodyMedium)
                 }
             }
